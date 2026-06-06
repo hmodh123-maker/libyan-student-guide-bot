@@ -240,6 +240,19 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    try:
+        json_string = request.get_data().decode("utf-8")
+        update = telebot.types.Update.de_json(json_string)
+        bot.process_new_updates([update])
+        print("Update received and processed")
+    except Exception as e:
+        print("Webhook error:", e)
+    return "OK", 200
+
+
+bot.remove_webhook()
+bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
+print("Webhook set to:", f"{WEBHOOK_URL}/webhook")
     update = telebot.types.Update.de_json(request.get_data().decode("utf-8"))
     bot.process_new_updates([update])
     return "OK", 200

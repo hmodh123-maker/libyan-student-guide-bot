@@ -253,13 +253,7 @@ def webhook():
 bot.remove_webhook()
 bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
 print("Webhook set to:", f"{WEBHOOK_URL}/webhook")
-    update = telebot.types.Update.de_json(request.get_data().decode("utf-8"))
-    bot.process_new_updates([update])
-    return "OK", 200
-
-
-bot.remove_webhook()
-bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
+  
 
 
 if __name__ == "__main__":

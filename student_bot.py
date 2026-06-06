@@ -233,27 +233,51 @@ def handle_buttons(call):
         )
 
 
-@app.route("/")
-def home():
-    return "Libyan Student Guide Bot is running."
-
-
 @app.route("/webhook", methods=["POST"])
 def webhook():
     try:
         json_string = request.get_data().decode("utf-8")
         update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
+
+        if update.message and update.message.text:
+            text = update.message.text.strip()
+            chat_id = update.message.chat.id
+
+            print("Message text:", text)
+
+            if text.startswith("/start"):
+                welcome_text = """
+أهلاً بك في دليل الطالب الليبي 🎓📚
+
+هذا البوت يجمع كل ما يحتاجه الطالب في مكان واحد:
+
+✅ أسئلة امتحانات سابقة
+✅ مناهج وملخصات
+✅ كورسات وشروحات
+✅ روابط قروبات المواد
+✅ ملفات ومراجع مفيدة
+
+اختر القسم المطلوب:
+"""
+                bot.send_message(chat_id, welcome_text, reply_markup=main_menu())
+
+            elif text.startswith("/help"):
+                bot.send_message(chat_id, "اضغط /start لفتح القائمة الرئيسية.")
+
+        elif update.callback_query:
+            bot.process_new_updates([update])
+
         print("Update received and processed")
+
     except Exception as e:
-        print("Webhook error:", e)
+        print("Webhook error:", repr(e))
+
     return "OK", 200
 
 
 bot.remove_webhook()
 bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
 print("Webhook set to:", f"{WEBHOOK_URL}/webhook")
-  
 
 
 if __name__ == "__main__":

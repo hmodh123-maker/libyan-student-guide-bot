@@ -118,6 +118,7 @@ def help_command(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_buttons(call):
+   bot.answer_callback_query(call.id)
     data = call.data
 
     if data == "main":

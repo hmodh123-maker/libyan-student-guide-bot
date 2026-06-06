@@ -4,7 +4,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask import Flask, request
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-WEBHOOK_URL = os.environ["WEBHOOK_URL"].rstrip().rstrip("/")
+WEBHOOK_URL = os.environ["WEBHOOK_URL"].strip().rstrip("/")
 
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)

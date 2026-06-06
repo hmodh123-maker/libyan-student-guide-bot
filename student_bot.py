@@ -223,7 +223,23 @@ def handle_buttons(call):
             call.message.message_id,
             reply_markup=back_menu()
         )
+    elif data == "secondary_notes":
+        text = """
+📚 مناهج وملخصات الشهادة الثانوية
 
+📘 ثالثة ثانوي - القسم العلمي
+
+🧮 ملف رياضيات ثالثة ثانوي:
+https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
+
+سيتم إضافة باقي المواد تدريجيًا بإذن الله.
+"""
+        bot.edit_message_text(
+            text,
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=back_menu()
+        )
     else:
         bot.edit_message_text(
             "📚 سيتم إضافة الملفات والأسئلة والملخصات هنا قريبًا بإذن الله.",

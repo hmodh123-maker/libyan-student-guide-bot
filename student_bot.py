@@ -118,7 +118,7 @@ def help_command(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_buttons(call):
-   bot.answer_callback_query(call.id)
+    bot.answer_callback_query(call.id)
     data = call.data
 
     if data == "main":
@@ -217,13 +217,6 @@ def handle_buttons(call):
             reply_markup=back_menu()
         )
 
-    elif data.startswith("secondary_"):
-        bot.edit_message_text(
-            "🎒 سيتم إضافة محتوى الشهادة الثانوية هنا قريبًا بإذن الله.",
-            call.message.chat.id,
-            call.message.message_id,
-            reply_markup=back_menu()
-        )
     elif data == "secondary_notes":
         text = """
 📚 مناهج وملخصات الشهادة الثانوية
@@ -241,6 +234,15 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
             call.message.message_id,
             reply_markup=back_menu()
         )
+
+    elif data.startswith("secondary_"):
+        bot.edit_message_text(
+            "🎒 سيتم إضافة محتوى الشهادة الثانوية هنا قريبًا بإذن الله.",
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=back_menu()
+        )
+
     else:
         bot.edit_message_text(
             "📚 سيتم إضافة الملفات والأسئلة والملخصات هنا قريبًا بإذن الله.",
@@ -248,6 +250,11 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
             call.message.message_id,
             reply_markup=back_menu()
         )
+
+
+@app.route("/")
+def home():
+    return "Libyan Student Guide Bot is running."
 
 
 @app.route("/webhook", methods=["POST"])

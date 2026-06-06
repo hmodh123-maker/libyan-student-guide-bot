@@ -3,6 +3,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
+PORT = int(os.environ.get("PORT", 10000))
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 
 
 def main_menu():
@@ -19,9 +21,10 @@ def main_menu():
 
 
 def back_menu():
-    return InlineKeyboardMarkup([
+    keyboard = [
         [InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main")]
-    ])
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
 
 def secondary_menu():
@@ -118,25 +121,44 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+
     data = query.data
 
     if data == "main":
-        await query.edit_message_text("🎓 القائمة الرئيسية\n\nاختر القسم المطلوب:", reply_markup=main_menu())
+        await query.edit_message_text(
+            "🎓 القائمة الرئيسية\n\nاختر القسم المطلوب:",
+            reply_markup=main_menu()
+        )
 
     elif data == "secondary":
-        await query.edit_message_text("🎒 الشهادة الثانوية\n\nاختر القسم أو الخدمة:", reply_markup=secondary_menu())
+        await query.edit_message_text(
+            "🎒 الشهادة الثانوية\n\nاختر القسم أو الخدمة:",
+            reply_markup=secondary_menu()
+        )
 
     elif data == "civil":
-        await query.edit_message_text("🏗️ الهندسة المدنية\n\nاختر المادة أو الخدمة:", reply_markup=civil_menu())
+        await query.edit_message_text(
+            "🏗️ الهندسة المدنية\n\nاختر المادة أو الخدمة:",
+            reply_markup=civil_menu()
+        )
 
     elif data == "geology":
-        await query.edit_message_text("🪨 الجيولوجيا\n\nاختر القسم:", reply_markup=geology_menu())
+        await query.edit_message_text(
+            "🪨 الجيولوجيا\n\nاختر القسم:",
+            reply_markup=geology_menu()
+        )
 
     elif data == "petroleum":
-        await query.edit_message_text("🛢️ هندسة النفط\n\nاختر المجال:", reply_markup=petroleum_menu())
+        await query.edit_message_text(
+            "🛢️ هندسة النفط\n\nاختر المجال:",
+            reply_markup=petroleum_menu()
+        )
 
     elif data == "electrical":
-        await query.edit_message_text("⚡ الهندسة الكهربائية\n\nاختر المجال:", reply_markup=electrical_menu())
+        await query.edit_message_text(
+            "⚡ الهندسة الكهربائية\n\nاختر المجال:",
+            reply_markup=electrical_menu()
+        )
 
     elif data == "groups":
         text = """
@@ -196,8 +218,15 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    print("Bot is running...")
-    app.run_polling()
+    if WEBHOOK_URL:
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path=BOT_TOKEN,
+            webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}",
+        )
+    else:
+        app.run_polling()
 
 
 if __name__ == "__main__":

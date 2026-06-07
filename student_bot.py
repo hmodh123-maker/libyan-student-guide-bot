@@ -18,7 +18,7 @@ def main_menu():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("🎒 الشهادة الثانوية", callback_data="secondary"))
     markup.add(InlineKeyboardButton("🏗️ الهندسة المدنية", callback_data="civil"))
-    markup.add(InlineKeyboardButton("🪨 الجيولوجيا", callback_data="geology"))
+    markup.add(InlineKeyboardButton("🪨 الهندسة الجيولوجية", callback_data="geology"))
     markup.add(InlineKeyboardButton("🛢️ هندسة النفط", callback_data="petroleum"))
     markup.add(InlineKeyboardButton("⚡ الهندسة الكهربائية", callback_data="electrical"))
     markup.add(InlineKeyboardButton("👥 روابط القروبات", callback_data="groups"))
@@ -36,8 +36,8 @@ def secondary_menu():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("📘 القسم العلمي", callback_data="secondary_science"))
     markup.add(InlineKeyboardButton("📗 القسم الأدبي", callback_data="secondary_literary"))
+    markup.add(InlineKeyboardButton("📚 مناهج وملخصات", callback_data="secondary_notes"))
     markup.add(InlineKeyboardButton("📝 أسئلة امتحانات سابقة", callback_data="secondary_exams"))
-    markup.add(InlineKeyboardButton("📚 ملخصات ومناهج", callback_data="secondary_notes"))
     markup.add(InlineKeyboardButton("🎥 كورسات وشرح", callback_data="secondary_courses"))
     markup.add(InlineKeyboardButton("🔙 رجوع", callback_data="main"))
     return markup
@@ -45,23 +45,24 @@ def secondary_menu():
 
 def civil_menu():
     markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("📚 مناهج وملخصات المدني", callback_data="civil_syllabus"))
     markup.add(InlineKeyboardButton("🧱 خواص مواد CE133", callback_data="civil_ce133"))
-    markup.add(InlineKeyboardButton("📐 تحليل إنشائي CE203", callback_data="civil_ce203"))
-    markup.add(InlineKeyboardButton("🚗 هندسة النقل CE311", callback_data="civil_ce311"))
-    markup.add(InlineKeyboardButton("🚰 الهندسة الصحية", callback_data="civil_sanitary"))
-    markup.add(InlineKeyboardButton("📚 مناهج القسم", callback_data="civil_syllabus"))
-    markup.add(InlineKeyboardButton("📝 أسئلة امتحانات", callback_data="civil_exams"))
+    markup.add(InlineKeyboardButton("🚗 ترانس CE311", callback_data="civil_ce311"))
+    markup.add(InlineKeyboardButton("💧 فلود 1 CE221", callback_data="civil_ce221"))
+    markup.add(InlineKeyboardButton("📏 مساحة 1", callback_data="civil_survey1"))
+    markup.add(InlineKeyboardButton("📐 تحليل إنشائي 2 CE303", callback_data="civil_ce303"))
+    markup.add(InlineKeyboardButton("🌱 سويل 1 CE342", callback_data="civil_ce342"))
     markup.add(InlineKeyboardButton("🔙 رجوع", callback_data="main"))
     return markup
 
 
 def geology_menu():
     markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("📚 مناهج وملخصات الجيولوجيا", callback_data="geo_syllabus"))
+    markup.add(InlineKeyboardButton("🧪 جيوكيمياء - جزئية النصفي", callback_data="geo_geochemistry"))
     markup.add(InlineKeyboardButton("🌍 جيولوجيا عامة", callback_data="geo_general"))
     markup.add(InlineKeyboardButton("🗺️ خرائط جيولوجية", callback_data="geo_maps"))
     markup.add(InlineKeyboardButton("🪨 الصخور والمعادن", callback_data="geo_rocks"))
-    markup.add(InlineKeyboardButton("🛢️ جيولوجيا النفط", callback_data="geo_petroleum"))
-    markup.add(InlineKeyboardButton("📝 أسئلة وملخصات", callback_data="geo_exams"))
     markup.add(InlineKeyboardButton("🔙 رجوع", callback_data="main"))
     return markup
 
@@ -177,7 +178,7 @@ def handle_buttons(call):
 
     elif data == "geology":
         bot.edit_message_text(
-            "🪨 الجيولوجيا\n\nاختر القسم:",
+            "🪨 الهندسة الجيولوجية\n\nاختر المادة أو الخدمة:",
             chat_id,
             message_id,
             reply_markup=geology_menu()
@@ -199,13 +200,17 @@ def handle_buttons(call):
             reply_markup=electrical_menu()
         )
 
+    # =========================
+    # SECONDARY SCHOOL
+    # =========================
+
     elif data == "secondary_notes":
         text = """
 📚 مناهج وملخصات الشهادة الثانوية
 
 📘 ثالثة ثانوي - القسم العلمي
 
-🧮 ملف رياضيات ثالثة ثانوي:
+🧮 رياضيات علمي:
 https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
 
 سيتم إضافة باقي المواد تدريجيًا بإذن الله.
@@ -219,16 +224,25 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
         )
 
     elif data == "secondary_science":
+        text = """
+📘 القسم العلمي - ثالثة ثانوي
+
+🧮 رياضيات علمي:
+https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
+
+سيتم إضافة الفيزياء والكيمياء والأحياء وباقي المواد تدريجيًا بإذن الله.
+"""
         bot.edit_message_text(
-            "📘 القسم العلمي\n\nسيتم إضافة مواد القسم العلمي تدريجيًا بإذن الله.",
+            text,
             chat_id,
             message_id,
-            reply_markup=back_menu()
+            reply_markup=back_menu(),
+            disable_web_page_preview=True
         )
 
     elif data == "secondary_literary":
         bot.edit_message_text(
-            "📗 القسم الأدبي\n\nسيتم إضافة مواد القسم الأدبي تدريجيًا بإذن الله.",
+            "📗 القسم الأدبي\n\nسيتم إضافة ملفات القسم الأدبي قريبًا بإذن الله.",
             chat_id,
             message_id,
             reply_markup=back_menu()
@@ -250,6 +264,136 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
             reply_markup=back_menu()
         )
 
+    # =========================
+    # CIVIL ENGINEERING
+    # =========================
+
+    elif data == "civil_syllabus":
+        text = """
+📚 مناهج وملخصات الهندسة المدنية
+
+🧱 خواص مواد CE133:
+https://drive.google.com/file/d/1gpgq8yERZvk9X3rTSQoB6g-6HusfN9LT/view?usp=drivesdk
+
+🚗 ترانس CE311:
+https://drive.google.com/file/d/1FNU8Sxvjqeb9Gz_fD_fsW1dCeI9HNkyx/view?usp=drivesdk
+
+💧 فلود 1 CE221:
+https://drive.google.com/file/d/1GM-Pvf9QDmOdaGyXvJJjW3UyLh2K-Lg8/view?usp=drivesdk
+
+📏 مساحة 1:
+https://drive.google.com/file/d/1xWiBFkdIqwh5kIwvWbGneApesv5vgn9K/view?usp=drivesdk
+
+📐 تحليل إنشائي 2 CE303:
+https://drive.google.com/file/d/1adZECZXZpD99P7zT-DIom8N_1IXfXGYi/view?usp=drivesdk
+
+🌱 سويل 1 CE342:
+https://drive.google.com/file/d/1xiUoWYVH1UJKsTTU_RAXA7wEXMNF8Xpc/view?usp=drivesdk
+"""
+        bot.edit_message_text(
+            text,
+            chat_id,
+            message_id,
+            reply_markup=back_menu(),
+            disable_web_page_preview=True
+        )
+
+    elif data == "civil_ce133":
+        text = """
+🧱 خواص مواد CE133
+
+رابط الملف:
+https://drive.google.com/file/d/1gpgq8yERZvk9X3rTSQoB6g-6HusfN9LT/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    elif data == "civil_ce311":
+        text = """
+🚗 ترانس CE311
+
+رابط الملف:
+https://drive.google.com/file/d/1FNU8Sxvjqeb9Gz_fD_fsW1dCeI9HNkyx/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    elif data == "civil_ce221":
+        text = """
+💧 فلود 1 CE221
+
+رابط الملف:
+https://drive.google.com/file/d/1GM-Pvf9QDmOdaGyXvJJjW3UyLh2K-Lg8/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    elif data == "civil_survey1":
+        text = """
+📏 مساحة 1
+
+رابط الملف:
+https://drive.google.com/file/d/1xWiBFkdIqwh5kIwvWbGneApesv5vgn9K/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    elif data == "civil_ce303":
+        text = """
+📐 تحليل إنشائي 2 CE303
+
+رابط الملف:
+https://drive.google.com/file/d/1adZECZXZpD99P7zT-DIom8N_1IXfXGYi/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    elif data == "civil_ce342":
+        text = """
+🌱 سويل 1 CE342
+
+رابط الملف:
+https://drive.google.com/file/d/1xiUoWYVH1UJKsTTU_RAXA7wEXMNF8Xpc/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    # =========================
+    # GEOLOGY ENGINEERING
+    # =========================
+
+    elif data == "geo_syllabus":
+        text = """
+📚 مناهج وملخصات الهندسة الجيولوجية
+
+🧪 جيوكيمياء - جزئية النصفي:
+https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drivesdk
+
+سيتم إضافة باقي مواد الجيولوجيا تدريجيًا بإذن الله.
+"""
+        bot.edit_message_text(
+            text,
+            chat_id,
+            message_id,
+            reply_markup=back_menu(),
+            disable_web_page_preview=True
+        )
+
+    elif data == "geo_geochemistry":
+        text = """
+🧪 جيوكيمياء - جزئية النصفي
+
+رابط الملف:
+https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drivesdk
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+
+    elif data in ["geo_general", "geo_maps", "geo_rocks"]:
+        bot.edit_message_text(
+            "🪨 سيتم إضافة هذا المحتوى قريبًا بإذن الله.",
+            chat_id,
+            message_id,
+            reply_markup=back_menu()
+        )
+
+    # =========================
+    # OTHER SECTIONS
+    # =========================
+
     elif data == "groups":
         text = """
 👥 روابط القروبات
@@ -260,7 +404,7 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
 🏗️ الهندسة المدنية:
 ضع الرابط هنا
 
-🪨 الجيولوجيا:
+🪨 الهندسة الجيولوجية:
 ضع الرابط هنا
 
 🛢️ هندسة النفط:

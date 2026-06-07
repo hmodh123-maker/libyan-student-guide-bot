@@ -10,6 +10,10 @@ bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
 
+# =========================
+# MENUS
+# =========================
+
 def main_menu():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("🎒 الشهادة الثانوية", callback_data="secondary"))
@@ -84,9 +88,12 @@ def electrical_menu():
     return markup
 
 
-@bot.message_handler(commands=["start"])
-def start(message):
-    text = """
+# =========================
+# TEXTS
+# =========================
+
+def welcome_text():
+    return """
 أهلاً بك في دليل الطالب الليبي 🎓📚
 
 هذا البوت يجمع كل ما يحتاجه الطالب في مكان واحد:
@@ -99,12 +106,10 @@ def start(message):
 
 اختر القسم المطلوب:
 """
-    bot.send_message(message.chat.id, text, reply_markup=main_menu())
 
 
-@bot.message_handler(commands=["help"])
-def help_command(message):
-    text = """
+def help_text():
+    return """
 طريقة استخدام البوت:
 
 اضغط /start لفتح القائمة الرئيسية.
@@ -113,60 +118,136 @@ def help_command(message):
 لإرسال ملفات أو أسئلة امتحانات للإضافة:
 راسل الإدارة.
 """
-    bot.send_message(message.chat.id, text)
 
+
+# =========================
+# COMMANDS
+# =========================
+
+@bot.message_handler(commands=["start"])
+def start(message):
+    bot.send_message(message.chat.id, welcome_text(), reply_markup=main_menu())
+
+
+@bot.message_handler(commands=["help"])
+def help_command(message):
+    bot.send_message(message.chat.id, help_text())
+
+
+# =========================
+# BUTTON HANDLER
+# =========================
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_buttons(call):
-    bot.answer_callback_query(call.id)
+    try:
+        bot.answer_callback_query(call.id)
+    except Exception as e:
+        print("answer_callback_query error:", repr(e))
+
     data = call.data
+    chat_id = call.message.chat.id
+    message_id = call.message.message_id
+
+    print("Callback data:", data)
 
     if data == "main":
         bot.edit_message_text(
             "🎓 القائمة الرئيسية\n\nاختر القسم المطلوب:",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=main_menu()
         )
 
     elif data == "secondary":
         bot.edit_message_text(
             "🎒 الشهادة الثانوية\n\nاختر القسم أو الخدمة:",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=secondary_menu()
         )
 
     elif data == "civil":
         bot.edit_message_text(
             "🏗️ الهندسة المدنية\n\nاختر المادة أو الخدمة:",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=civil_menu()
         )
 
     elif data == "geology":
         bot.edit_message_text(
             "🪨 الجيولوجيا\n\nاختر القسم:",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=geology_menu()
         )
 
     elif data == "petroleum":
         bot.edit_message_text(
             "🛢️ هندسة النفط\n\nاختر المجال:",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=petroleum_menu()
         )
 
     elif data == "electrical":
         bot.edit_message_text(
             "⚡ الهندسة الكهربائية\n\nاختر المجال:",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=electrical_menu()
+        )
+
+    elif data == "secondary_notes":
+        text = """
+📚 مناهج وملخصات الشهادة الثانوية
+
+📘 ثالثة ثانوي - القسم العلمي
+
+🧮 ملف رياضيات ثالثة ثانوي:
+https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
+
+سيتم إضافة باقي المواد تدريجيًا بإذن الله.
+"""
+        bot.edit_message_text(
+            text,
+            chat_id,
+            message_id,
+            reply_markup=back_menu(),
+            disable_web_page_preview=True
+        )
+
+    elif data == "secondary_science":
+        bot.edit_message_text(
+            "📘 القسم العلمي\n\nسيتم إضافة مواد القسم العلمي تدريجيًا بإذن الله.",
+            chat_id,
+            message_id,
+            reply_markup=back_menu()
+        )
+
+    elif data == "secondary_literary":
+        bot.edit_message_text(
+            "📗 القسم الأدبي\n\nسيتم إضافة مواد القسم الأدبي تدريجيًا بإذن الله.",
+            chat_id,
+            message_id,
+            reply_markup=back_menu()
+        )
+
+    elif data == "secondary_exams":
+        bot.edit_message_text(
+            "📝 أسئلة امتحانات الشهادة الثانوية\n\nسيتم إضافة الأسئلة السابقة قريبًا بإذن الله.",
+            chat_id,
+            message_id,
+            reply_markup=back_menu()
+        )
+
+    elif data == "secondary_courses":
+        bot.edit_message_text(
+            "🎥 كورسات وشرح الشهادة الثانوية\n\nسيتم إضافة الشروحات والكورسات قريبًا بإذن الله.",
+            chat_id,
+            message_id,
+            reply_markup=back_menu()
         )
 
     elif data == "groups":
@@ -190,8 +271,8 @@ def handle_buttons(call):
 """
         bot.edit_message_text(
             text,
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=back_menu()
         )
 
@@ -212,45 +293,23 @@ def handle_buttons(call):
 """
         bot.edit_message_text(
             text,
-            call.message.chat.id,
-            call.message.message_id,
-            reply_markup=back_menu()
-        )
-
-    elif data == "secondary_notes":
-        text = """
-📚 مناهج وملخصات الشهادة الثانوية
-
-📘 ثالثة ثانوي - القسم العلمي
-
-🧮 ملف رياضيات ثالثة ثانوي:
-https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
-
-سيتم إضافة باقي المواد تدريجيًا بإذن الله.
-"""
-        bot.edit_message_text(
-            text,
-            call.message.chat.id,
-            call.message.message_id,
-            reply_markup=back_menu()
-        )
-
-    elif data.startswith("secondary_"):
-        bot.edit_message_text(
-            "🎒 سيتم إضافة محتوى الشهادة الثانوية هنا قريبًا بإذن الله.",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=back_menu()
         )
 
     else:
         bot.edit_message_text(
             "📚 سيتم إضافة الملفات والأسئلة والملخصات هنا قريبًا بإذن الله.",
-            call.message.chat.id,
-            call.message.message_id,
+            chat_id,
+            message_id,
             reply_markup=back_menu()
         )
 
+
+# =========================
+# FLASK ROUTES
+# =========================
 
 @app.route("/")
 def home():
@@ -263,6 +322,8 @@ def webhook():
         json_string = request.get_data().decode("utf-8")
         update = telebot.types.Update.de_json(json_string)
 
+        print("Raw update:", json_string)
+
         if update.message and update.message.text:
             text = update.message.text.strip()
             chat_id = update.message.chat.id
@@ -270,26 +331,14 @@ def webhook():
             print("Message text:", text)
 
             if text.startswith("/start"):
-                welcome_text = """
-أهلاً بك في دليل الطالب الليبي 🎓📚
-
-هذا البوت يجمع كل ما يحتاجه الطالب في مكان واحد:
-
-✅ أسئلة امتحانات سابقة
-✅ مناهج وملخصات
-✅ كورسات وشروحات
-✅ روابط قروبات المواد
-✅ ملفات ومراجع مفيدة
-
-اختر القسم المطلوب:
-"""
-                bot.send_message(chat_id, welcome_text, reply_markup=main_menu())
+                bot.send_message(chat_id, welcome_text(), reply_markup=main_menu())
 
             elif text.startswith("/help"):
-                bot.send_message(chat_id, "اضغط /start لفتح القائمة الرئيسية.")
+                bot.send_message(chat_id, help_text())
 
         elif update.callback_query:
-            bot.process_new_updates([update])
+            print("Callback received:", update.callback_query.data)
+            handle_buttons(update.callback_query)
 
         print("Update received and processed")
 
@@ -298,6 +347,10 @@ def webhook():
 
     return "OK", 200
 
+
+# =========================
+# SET WEBHOOK
+# =========================
 
 bot.remove_webhook()
 bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")

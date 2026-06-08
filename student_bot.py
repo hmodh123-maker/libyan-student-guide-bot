@@ -11,13 +11,13 @@ app = Flask(__name__)
 
 
 # =========================
-# MENUS
+# MENUS & MARKUPS
 # =========================
 
 def main_menu():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("🎒 الشهادة الثانوية", callback_data="secondary"))
-    markup.add(InlineKeyboardButton("🏗️ الهندسة المدنية", callback_data="civil"))
+    markup.add(InlineKeyboardButton("🏗️ الهندسة المدنية (المستويات)", callback_data="civil_levels"))
     markup.add(InlineKeyboardButton("🪨 الهندسة الجيولوجية", callback_data="geology"))
     markup.add(InlineKeyboardButton("🛢️ هندسة النفط", callback_data="petroleum"))
     markup.add(InlineKeyboardButton("⚡ الهندسة الكهربائية", callback_data="electrical"))
@@ -32,6 +32,13 @@ def back_menu():
     return markup
 
 
+def back_to_civil_menu():
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("🔙 رجوع لقائمة المستويات", callback_data="civil_levels"))
+    markup.add(InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main"))
+    return markup
+
+
 def secondary_menu():
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("📘 القسم العلمي", callback_data="secondary_science"))
@@ -43,16 +50,15 @@ def secondary_menu():
     return markup
 
 
-def civil_menu():
+# القائمة الجديدة للمستويات في الهندسة المدنية
+def civil_levels_menu():
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton("📚 مناهج وملخصات المدني", callback_data="civil_syllabus"))
-    markup.add(InlineKeyboardButton("🧱 خواص مواد CE133", callback_data="civil_ce133"))
-    markup.add(InlineKeyboardButton("🚗 ترانس CE311", callback_data="civil_ce311"))
-    markup.add(InlineKeyboardButton("💧 فلود 1 CE221", callback_data="civil_ce221"))
-    markup.add(InlineKeyboardButton("📏 مساحة 1", callback_data="civil_survey1"))
-    markup.add(InlineKeyboardButton("📐 تحليل إنشائي 2 CE303", callback_data="civil_ce303"))
-    markup.add(InlineKeyboardButton("🌱 سويل 1 CE342", callback_data="civil_ce342"))
-    markup.add(InlineKeyboardButton("🔙 رجوع", callback_data="main"))
+    markup.add(InlineKeyboardButton("🧱 مستوى 100", callback_data="civil_lvl_100"))
+    markup.add(InlineKeyboardButton("📐 مستوى 200", callback_data="civil_lvl_200"))
+    markup.add(InlineKeyboardButton("💧 مستوى 300", callback_data="civil_lvl_300"))
+    markup.add(InlineKeyboardButton("🏗️ مستوى 400", callback_data="civil_lvl_400"))
+    markup.add(InlineKeyboardButton("🚗 مستوى 500", callback_data="civil_lvl_500"))
+    markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main"))
     return markup
 
 
@@ -90,34 +96,35 @@ def electrical_menu():
 
 
 # =========================
-# TEXTS
+# TEXTS & MESSAGES
 # =========================
 
 def welcome_text():
     return """
-أهلاً بك في دليل الطالب الليبي 🎓📚
+✨ أهلاً بك في دليل الطالب الليبي الأرقى 🎓📚
 
-هذا البوت يجمع كل ما يحتاجه الطالب في مكان واحد:
+تم تصميم هذا البوت بمظهر عصري ليجمع لك كل ما تحتاجه في مسيرتك الدراسية بكل سهولة وسرعة 🚀
 
-✅ أسئلة امتحانات سابقة
-✅ مناهج وملخصات
-✅ كورسات وشروحات
-✅ روابط قروبات المواد
-✅ ملفات ومراجع مفيدة
+💼 **ماذا يقدم لك البوت؟**
+✅ أسئلة امتحانات سابقة دورية
+✅ مناهج، ملخصات، وشيتات منسقة
+✅ كورسات وشروحات مميزة
+✅ روابط قروبات المواد التفاعلية
+✅ مراجع وملفات حصرية لكل التخصصات
 
-اختر القسم المطلوب:
+👇 **اختر القسم المطلوب من الأسفل وابدأ التصفح الآن:**
 """
 
 
 def help_text():
     return """
-طريقة استخدام البوت:
+💡 **دليل استخدام البوت السريع:**
 
-اضغط /start لفتح القائمة الرئيسية.
-ثم اختر القسم المطلوب من الأزرار.
+🔹 اضغط على الأمر /start لإظهار القائمة الرئيسية في أي وقت.
+🔹 تنقل بين الأقسام والمستويات عبر الأزرار التفاعلية المرفقة أسفل كل رسالة.
 
-لإرسال ملفات أو أسئلة امتحانات للإضافة:
-راسل الإدارة.
+📥 **هل تريد المساهمة وتطوير البوت؟**
+إذا كان لديك ملفات، ملخصات، أو أسئلة امتحانات وترغب في إضافتها لتفيد زملائك، يمكنك مراسلة الدعم الفني مباشرة عبر قسم "تواصل مع الإدارة".
 """
 
 
@@ -154,7 +161,7 @@ def handle_buttons(call):
 
     if data == "main":
         bot.edit_message_text(
-            "🎓 القائمة الرئيسية\n\nاختر القسم المطلوب:",
+            "🗂️ **القائمة الرئيسية**\n\nيرجى اختيار القسم أو التخصص المطلوب استكشافه:",
             chat_id,
             message_id,
             reply_markup=main_menu()
@@ -162,23 +169,135 @@ def handle_buttons(call):
 
     elif data == "secondary":
         bot.edit_message_text(
-            "🎒 الشهادة الثانوية\n\nاختر القسم أو الخدمة:",
+            "🎒 **قسم الشهادة الثانوية**\n\nاختر القسم الدراسي أو نوع الخدمة المطلوبة:",
             chat_id,
             message_id,
             reply_markup=secondary_menu()
         )
 
-    elif data == "civil":
+    # ==========================================
+    # CIVIL ENGINEERING - LEVELS (NEW STRUCTURE)
+    # ==========================================
+    elif data == "civil_levels":
         bot.edit_message_text(
-            "🏗️ الهندسة المدنية\n\nاختر المادة أو الخدمة:",
+            "🏗️ **كلية الهندسة - قسم الهندسة المدنية**\n\nمرحباً بك في الأرشيف المطور للمواد. تم تقسيم المواد حسب مستوياتها الأكاديمية لتسهيل وصولك المباشر:\n\n👇 اختر المستوى الدراسي المُراد تصفحه:",
             chat_id,
             message_id,
-            reply_markup=civil_menu()
+            reply_markup=civil_levels_menu()
         )
+
+    elif data == "civil_lvl_100":
+        text = """
+🧱 **الهندسة المدنية - مواد مستوى 100**
+
+📝 **المواد المتاحة حالياً:**
+
+🗂️ **خواص مواد (CE133):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/file/d/1gpgq8yERZvk9X3rTSQoB6g-6HusfN9LT/view?usp=drivesdk)
+
+📝 **كتابة تقارير (GH152):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1IqkfVOSphPkES4HCJgGn3o8m9RE0mlAw?usp=drive_link)
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_to_civil_menu(), parse_mode="Markdown", disable_web_page_preview=True)
+
+    elif data == "civil_lvl_200":
+        text = """
+📐 **الهندسة المدنية - مواد مستوى 200**
+
+📝 **المواد المتاحة حالياً:**
+
+💧 **فلود 1 (CE221):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/file/d/1GM-Pvf9QDmOdaGyXvJJjW3UyLh2K-Lg8/view?usp=drivesdk)
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_to_civil_menu(), parse_mode="Markdown", disable_web_page_preview=True)
+
+    elif data == "civil_lvl_300":
+        text = """
+💧 **الهندسة المدنية - مواد مستوى 300**
+
+📝 **المواد المتاحة حالياً حسب الشعب:**
+
+📐 **تحليل إنشائي 1 (شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1MW6cp8JzFS9TWdS2rrFzquv2aNIFgYYD?usp=drive_link)
+
+📐 **تحليل إنشائي 2 (CE303):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/file/d/1adZECZXZpD99P7zT-DIom8N_1IXfXGYi/view?usp=drivesdk)
+
+🚗 **ترانس (CE311):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/file/d/1FNU8Sxvjqeb9Gz_fD_fsW1dCeI9HNkyx/view?usp=drivesdk)
+
+💧 **هيدرولوجيا (CE325 - شعبة المياه):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/14QBqY2p96-GbbDnFf3kHuJiioCr9SDIb?usp=drive_link)
+
+💧 **فلود 2 (CE322 - شعبة المياه):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/19byfltCT13ebw9GCEEK53HZ0VGuZD6e1?usp=drive_link)
+
+🌱 **سويل 1 (CE342):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/file/d/1xiUoWYVH1UJKsTTU_RAXA7wEXMNF8Xpc/view?usp=drivesdk)
+
+📏 **مساحة 1:**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/file/d/1xWiBFkdIqwh5kIwvWbGneApesv5vgn9K/view?usp=drivesdk)
+
+📏 **مساحة 2 (شعبة الطرق):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1KP4R9X1L3usjzU1cpbIGLrP5kSWCukle?usp=drive_link)
+
+🏥 **صحية 1 (CE372 - شعبة المياه):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1mpZXnVGn-g8nqUWnpw3tCy0DrUV4_DW9?usp=drive_link)
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_to_civil_menu(), parse_mode="Markdown", disable_web_page_preview=True)
+
+    elif data == "civil_lvl_400":
+        text = """
+🏗️ **الهندسة المدنية - مواد مستوى 400**
+
+📝 **المواد المتاحة حالياً حسب الشعب:**
+
+📐 **تحليل إنشائي (CE403 - شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1oUE7FjoPgObWbwJ8vmGi6rcB7JDHTduT?usp=drive_link)
+
+🧱 **كونكريت 2 (CE405 - شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1D7Km1YxYo2uqRE2WqV9LgPALng1HGiLm?usp=drive_link)
+
+🏗️ **ستيل 2 (CE407 - شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1hPtxESsngT1AUc9OW16QXF3iwflQ2U74?usp=drive_link)
+
+🚗 **رصف طرق (CE414 - شعبة الطرق):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1hgdRsP6osFpc70AcJQX0lidjBsHaHq3N?usp=drive_link)
+
+🚗 **طرق (CE416 - شعبة الطرق):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1oaKd7NkaEiB_-jxSvlOIZPAXGRT2j9TE?usp=drive_link)
+
+🌱 **تربة 2 (CE442 - شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/126fextvm80VLf7pyOI2p5cf0ZwioYFp9?usp=drive_link)
+
+🏢 **بلدنق / مباني (CE462 - شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/14st9edYJWUIMLIwEqJfiH2yOPfCBAIy_?usp=drive_link)
+
+📄 **مواصفات وعقود البناء (CE463 - شعبة الإنشاءات):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1GcLy8xkYtmrKDHUcW2USOGecxVMuZzYr?usp=drive_link)
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_to_civil_menu(), parse_mode="Markdown", disable_web_page_preview=True)
+
+    elif data == "civil_lvl_500":
+        text = """
+🚗 **الهندسة المدنية - مواد مستوى 500**
+
+📝 **المواد المتاحة حالياً حسب الشعب:**
+
+🛣️ **شعبة الطرق (CE512):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1OopY5wyAvXMi7dLs8ZG1so77Bnv9t9f4?usp=drive_link)
+
+🚦 **هندسة المرور (CE513):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1oOccHRiV8PanIAms7jdAEuGP_kVV350p?usp=drive_link)
+
+⚙️ **مادة كود الكلية المتخصصة (CE597T):**
+🌐 [اضغط هنا لفتح مجلد المادة](https://drive.google.com/drive/folders/1hy2gPFAr9nVm3THPJg1IFPEFxhx5rnHr?usp=drive_link)
+"""
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_to_civil_menu(), parse_mode="Markdown", disable_web_page_preview=True)
 
     elif data == "geology":
         bot.edit_message_text(
-            "🪨 الهندسة الجيولوجية\n\nاختر المادة أو الخدمة:",
+            "🪨 **قسم الهندسة الجيولوجية**\n\nاختر المادة أو الخدمة المتوفرة في الأرشيف المرفق أدناه:",
             chat_id,
             message_id,
             reply_markup=geology_menu()
@@ -186,7 +305,7 @@ def handle_buttons(call):
 
     elif data == "petroleum":
         bot.edit_message_text(
-            "🛢️ هندسة النفط\n\nاختر المجال:",
+            "🛢️ **قسم هندسة النفط**\n\nيرجى تحديد المجال الهندسي المطلوب للوصول لشيتاته وملخصاته:",
             chat_id,
             message_id,
             reply_markup=petroleum_menu()
@@ -194,7 +313,7 @@ def handle_buttons(call):
 
     elif data == "electrical":
         bot.edit_message_text(
-            "⚡ الهندسة الكهربائية\n\nاختر المجال:",
+            "⚡ **قسم الهندسة الكهربائية**\n\nاختر المجال الفرعي لعرض الشروحات والمناهج المتوفرة:",
             chat_id,
             message_id,
             reply_markup=electrical_menu()
@@ -206,43 +325,31 @@ def handle_buttons(call):
 
     elif data == "secondary_notes":
         text = """
-📚 مناهج وملخصات الشهادة الثانوية
+📚 **مناهج وملخصات الشهادة الثانوية**
 
-📘 ثالثة ثانوي - القسم العلمي
+📘 *ثالثة ثانوي - القسم العلمي*
 
-🧮 رياضيات علمي:
-https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
+🧮 **رياضيات علمي:**
+🌐 [رابط شيت مادة الرياضيات](https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk)
 
-سيتم إضافة باقي المواد تدريجيًا بإذن الله.
+💡 *تنويه: سيتم إضافة باقي المواد والملخصات تدريجيًا فور توفرها من الإدارة.*
 """
-        bot.edit_message_text(
-            text,
-            chat_id,
-            message_id,
-            reply_markup=back_menu(),
-            disable_web_page_preview=True
-        )
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), parse_mode="Markdown", disable_web_page_preview=True)
 
     elif data == "secondary_science":
         text = """
-📘 القسم العلمي - ثالثة ثانوي
+📘 **القسم العلمي - ثالثة ثانوي**
 
-🧮 رياضيات علمي:
-https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk
+🧮 **رياضيات علمي:**
+🌐 [رابط شيت مادة الرياضيات](https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drivesdk)
 
-سيتم إضافة الفيزياء والكيمياء والأحياء وباقي المواد تدريجيًا بإذن الله.
+💡 *تنويه: سيتم إضافة شروحات وملخصات الفيزياء، الكيمياء، الأحياء، وباقي المواد قريباً جداً.*
 """
-        bot.edit_message_text(
-            text,
-            chat_id,
-            message_id,
-            reply_markup=back_menu(),
-            disable_web_page_preview=True
-        )
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), parse_mode="Markdown", disable_web_page_preview=True)
 
     elif data == "secondary_literary":
         bot.edit_message_text(
-            "📗 القسم الأدبي\n\nسيتم إضافة ملفات القسم الأدبي قريبًا بإذن الله.",
+            "📗 **القسم الأدبي - ثالثة ثانوي**\n\nنحن نعمل حالياً على جمع وتنسيق الملفات والملخصات الخاصة بالقسم الأدبي وسيتم رفعها هنا قريباً جداً بإذن الله.",
             chat_id,
             message_id,
             reply_markup=back_menu()
@@ -250,7 +357,7 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
 
     elif data == "secondary_exams":
         bot.edit_message_text(
-            "📝 أسئلة امتحانات الشهادة الثانوية\n\nسيتم إضافة الأسئلة السابقة قريبًا بإذن الله.",
+            "📝 **أسئلة امتحانات الشهادة الثانوية**\n\nترقبوا إضافة بنك الأسئلة الشامل والامتحانات الوزارية السابقة لكل الأقسام قريباً بإذن الله.",
             chat_id,
             message_id,
             reply_markup=back_menu()
@@ -258,133 +365,39 @@ https://drive.google.com/file/d/1ThvdAywO6RhDcykaQm6sagft-vy5Y8a2/view?usp=drive
 
     elif data == "secondary_courses":
         bot.edit_message_text(
-            "🎥 كورسات وشرح الشهادة الثانوية\n\nسيتم إضافة الشروحات والكورسات قريبًا بإذن الله.",
+            "🎥 **كورسات وفيديوهات شرح الشهادة الثانوية**\n\nسيتم إدراج الروابط التعليمية وسلسلة الشروحات المرئية لأفضل المعلمين قريباً هنا.",
             chat_id,
             message_id,
             reply_markup=back_menu()
         )
 
     # =========================
-    # CIVIL ENGINEERING
-    # =========================
-
-    elif data == "civil_syllabus":
-        text = """
-📚 مناهج وملخصات الهندسة المدنية
-
-🧱 خواص مواد CE133:
-https://drive.google.com/file/d/1gpgq8yERZvk9X3rTSQoB6g-6HusfN9LT/view?usp=drivesdk
-
-🚗 ترانس CE311:
-https://drive.google.com/file/d/1FNU8Sxvjqeb9Gz_fD_fsW1dCeI9HNkyx/view?usp=drivesdk
-
-💧 فلود 1 CE221:
-https://drive.google.com/file/d/1GM-Pvf9QDmOdaGyXvJJjW3UyLh2K-Lg8/view?usp=drivesdk
-
-📏 مساحة 1:
-https://drive.google.com/file/d/1xWiBFkdIqwh5kIwvWbGneApesv5vgn9K/view?usp=drivesdk
-
-📐 تحليل إنشائي 2 CE303:
-https://drive.google.com/file/d/1adZECZXZpD99P7zT-DIom8N_1IXfXGYi/view?usp=drivesdk
-
-🌱 سويل 1 CE342:
-https://drive.google.com/file/d/1xiUoWYVH1UJKsTTU_RAXA7wEXMNF8Xpc/view?usp=drivesdk
-"""
-        bot.edit_message_text(
-            text,
-            chat_id,
-            message_id,
-            reply_markup=back_menu(),
-            disable_web_page_preview=True
-        )
-
-    elif data == "civil_ce133":
-        text = """
-🧱 خواص مواد CE133
-
-رابط الملف:
-https://drive.google.com/file/d/1gpgq8yERZvk9X3rTSQoB6g-6HusfN9LT/view?usp=drivesdk
-"""
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
-
-    elif data == "civil_ce311":
-        text = """
-🚗 ترانس CE311
-
-رابط الملف:
-https://drive.google.com/file/d/1FNU8Sxvjqeb9Gz_fD_fsW1dCeI9HNkyx/view?usp=drivesdk
-"""
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
-
-    elif data == "civil_ce221":
-        text = """
-💧 فلود 1 CE221
-
-رابط الملف:
-https://drive.google.com/file/d/1GM-Pvf9QDmOdaGyXvJJjW3UyLh2K-Lg8/view?usp=drivesdk
-"""
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
-
-    elif data == "civil_survey1":
-        text = """
-📏 مساحة 1
-
-رابط الملف:
-https://drive.google.com/file/d/1xWiBFkdIqwh5kIwvWbGneApesv5vgn9K/view?usp=drivesdk
-"""
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
-
-    elif data == "civil_ce303":
-        text = """
-📐 تحليل إنشائي 2 CE303
-
-رابط الملف:
-https://drive.google.com/file/d/1adZECZXZpD99P7zT-DIom8N_1IXfXGYi/view?usp=drivesdk
-"""
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
-
-    elif data == "civil_ce342":
-        text = """
-🌱 سويل 1 CE342
-
-رابط الملف:
-https://drive.google.com/file/d/1xiUoWYVH1UJKsTTU_RAXA7wEXMNF8Xpc/view?usp=drivesdk
-"""
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
-
-    # =========================
-    # GEOLOGY ENGINEERING
+    # GEOLOGY ENGINEERING HANDLER
     # =========================
 
     elif data == "geo_syllabus":
         text = """
-📚 مناهج وملخصات الهندسة الجيولوجية
+📚 **مناهج وملخصات الهندسة الجيولوجية**
 
-🧪 جيوكيمياء - جزئية النصفي:
-https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drivesdk
+🧪 **جيوكيمياء - جزئية النصفي:**
+🌐 [اضغط هنا لفتح رابط الملف](https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drivesdk)
 
-سيتم إضافة باقي مواد الجيولوجيا تدريجيًا بإذن الله.
+💡 *سيتم إضافة المزيد من مواد القسم والمستويات تباعاً.*
 """
-        bot.edit_message_text(
-            text,
-            chat_id,
-            message_id,
-            reply_markup=back_menu(),
-            disable_web_page_preview=True
-        )
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), parse_mode="Markdown", disable_web_page_preview=True)
 
     elif data == "geo_geochemistry":
         text = """
-🧪 جيوكيمياء - جزئية النصفي
+🧪 **مادة الجيوكيمياء - جزئية النصفي**
 
-رابط الملف:
-https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drivesdk
+تحميل مباشر عبر قوقل درايف:
+🌐 [رابط ملف الجيوكيمياء](https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drivesdk)
 """
-        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), disable_web_page_preview=True)
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), parse_mode="Markdown", disable_web_page_preview=True)
 
     elif data in ["geo_general", "geo_maps", "geo_rocks"]:
         bot.edit_message_text(
-            "🪨 سيتم إضافة هذا المحتوى قريبًا بإذن الله.",
+            "🪨 **تنبيه قسم الجيولوجيا**\n\nالمحتوى المختار جارٍ تجهيزه ومراجعته حالياً من قبل الإدارة، وسيتم توفيره قريباً.",
             chat_id,
             message_id,
             reply_markup=back_menu()
@@ -396,55 +409,37 @@ https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drive
 
     elif data == "groups":
         text = """
-👥 روابط القروبات
+👥 **الدليل الشامل لروابط قروبات التليجرام والواتساب**
 
-🎒 الشهادة الثانوية:
-ضع الرابط هنا
+اضغط على القروب المناسب لتخصصك لمتابعة المناقشات مع زملائك:
 
-🏗️ الهندسة المدنية:
-ضع الرابط هنا
-
-🪨 الهندسة الجيولوجية:
-ضع الرابط هنا
-
-🛢️ هندسة النفط:
-ضع الرابط هنا
-
-⚡ الهندسة الكهربائية:
-ضع الرابط هنا
+🎒 **الشهادة الثانوية:** [ضع الرابط هنا]
+🏗️ **الهندسة المدنية:** [ضع الرابط هنا]
+🪨 **الهندسة الجيولوجية:** [ضع الرابط هنا]
+🛢️ **هندسة النفط:** [ضع الرابط هنا]
+⚡ **الهندسة الكهربائية:** [ضع الرابط هنا]
 """
-        bot.edit_message_text(
-            text,
-            chat_id,
-            message_id,
-            reply_markup=back_menu()
-        )
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), parse_mode="Markdown")
 
     elif data == "contact":
         text = """
-☎️ تواصل مع الإدارة
+☎️ **تواصل المباشر مع إدارة دليل الطالب الليبي**
 
-لإرسال ملفات، أسئلة امتحانات، ملخصات، أو طلب إضافة قروب:
+مرحباً بك، يسعدنا تواصلك معنا لإرسال ملفات جديدة، شيتات، أسئلة امتحانات، أو لطلب إضافة قروب للمواد الدراسية.
 
-راسل الإدارة:
-@hmodh123
+📬 **معرف الإدارة المباشر:** @hmodh123
 
-أرسل:
-1. اسم القسم
-2. اسم المادة
-3. نوع الملف
-4. الملف أو الرابط
+📋 **يرجى عند إرسال مساهمتك تزويدنا بالتالي:**
+1️⃣ اسم التخصص والقسم (مثال: هندسة مدنية).
+2️⃣ اسم المادة وكودها (مثال: كونكريت 2 CE405).
+3️⃣ نوع الملف المرسل (شيت، ملخص، امتحان سابق).
+4️⃣ إرفاق الملف أو رابط قوقل درايف الخاص به.
 """
-        bot.edit_message_text(
-            text,
-            chat_id,
-            message_id,
-            reply_markup=back_menu()
-        )
+        bot.edit_message_text(text, chat_id, message_id, reply_markup=back_menu(), parse_mode="Markdown")
 
     else:
         bot.edit_message_text(
-            "📚 سيتم إضافة الملفات والأسئلة والملخصات هنا قريبًا بإذن الله.",
+            "📚 **قسم قيد التطوير**\n\nسيتم إضافة بايات المواد الشيتات والملخصات المتبقية في أقرب وقت ممكن.",
             chat_id,
             message_id,
             reply_markup=back_menu()
@@ -457,7 +452,7 @@ https://drive.google.com/file/d/14TnsBIykI8-rbYrNY7wSq-pYvZiTdT6-/view?usp=drive
 
 @app.route("/")
 def home():
-    return "Libyan Student Guide Bot is running."
+    return "Libyan Student Guide Bot is running flawlessly."
 
 
 @app.route("/webhook", methods=["POST"])

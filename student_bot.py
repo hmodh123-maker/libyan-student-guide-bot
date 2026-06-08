@@ -439,7 +439,7 @@ def handle_buttons(call):
 
     else:
         bot.edit_message_text(
-            "📚 **قسم قيد التطوير**\n\nسيتم إضافة بايات المواد الشيتات والملخصات المتبقية في أقرب وقت ممكن.",
+            "📚 **قسم قيد التطوير**\n\nسيتم إضافة بيانات المواد الشيتات والملخصات المتبقية في أقرب وقت ممكن.",
             chat_id,
             message_id,
             reply_markup=back_menu()
@@ -457,34 +457,16 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    try:
-        json_string = request.get_data().decode("utf-8")
-        update = telebot.types.Update.de_json(json_string)
-
-        print("Raw update:", json_string)
-
-        if update.message and update.message.text:
-            text = update.message.text.strip()
-            chat_id = update.message.chat.id
-
-            print("Message text:", text)
-
-            if text.startswith("/start"):
-                bot.send_message(chat_id, welcome_text(), reply_markup=main_menu())
-
-            elif text.startswith("/help"):
-                bot.send_message(chat_id, help_text())
-
-        elif update.callback_query:
-            print("Callback received:", update.callback_query.data)
-            handle_buttons(update.callback_query)
-
-        print("Update received and processed")
-
-    except Exception as e:
-        print("Webhook error:", repr(e))
-
-    return "OK", 200
+    if request.headers.get('content-type') == 'application/json':
+        try:
+            json_string = request.get_data().decode("utf-8")
+            update = telebot.types.Update.de_json(json_string)
+            bot.process_new_updates([update])
+        except Exception as e:
+            print("Webhook error:", repr(e))
+        return "OK", 200
+    else:
+        return "Forbidden", 403
 
 
 # =========================

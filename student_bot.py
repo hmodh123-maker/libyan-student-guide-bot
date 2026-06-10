@@ -3,19 +3,32 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask import Flask, request
 import logging
+import google.generativeai as genai
 
 # ====================== CONFIG ======================
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "").strip().rstrip("/")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not BOT_TOKEN or not WEBHOOK_URL:
     raise ValueError("❌ BOT_TOKEN أو WEBHOOK_URL غير موجودين في Render!")
+
+# إعداد الذكاء الاصطناعي
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    model = None
+    print("⚠️ تحذير: GEMINI_API_KEY غير موجود. المساعد الذكي لن يعمل.")
 
 bot = telebot.TeleBot(BOT_TOKEN, threaded=False)
 app = Flask(__name__)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# قاموس لحفظ حالات المستخدمين للذكاء الاصطناعي
+user_states = {}
 
 # ====================== TEXTS ======================
 def welcome_text():
@@ -36,6 +49,8 @@ def help_text():
 # ====================== MENUS ======================
 def main_menu():
     markup = InlineKeyboardMarkup(row_width=1)
+    # إضافة زر الذكاء الاصطناعي في أعلى القائمة
+    markup.add(InlineKeyboardButton("🤖 اسأل المساعد الذكي (AI)", callback_data="ask_ai"))
     markup.add(InlineKeyboardButton("🎒 الشهادة الثانوية", callback_data="secondary"))
     markup.add(InlineKeyboardButton("📖 الإعدادية", callback_data="preparatory"))
     markup.add(InlineKeyboardButton("🏗️ الهندسة المدنية", callback_data="civil_levels"))
@@ -172,11 +187,47 @@ def languages_menu():
 # ====================== COMMANDS ======================
 @bot.message_handler(commands=["start"])
 def start(message):
+    user_states[message.chat.id] = None # تصفير حالة الذكاء الاصطناعي
     bot.send_message(message.chat.id, welcome_text(), reply_markup=main_menu(), parse_mode="HTML", disable_web_page_preview=True)
 
 @bot.message_handler(commands=["help"])
 def help_command(message):
     bot.send_message(message.chat.id, help_text(), parse_mode="HTML")
+
+# ====================== AI TEXT HANDLER ======================
+# هذه الدالة تلتقط الأسئلة النصية العادية وتوجهها للذكاء الاصطناعي إذا كان في وضع السؤال
+@bot.message_handler(content_types=['text'])
+def handle_text_messages(message):
+    chat_id = message.chat.id
+    text = message.text
+
+    if user_states.get(chat_id) == "waiting_for_ai":
+        if not model:
+            bot.send_message(chat_id, "⚠️ خدمة الذكاء الاصطناعي غير مفعلة حالياً. يرجى مراجعة الإدارة.", reply_markup=back_menu())
+            user_states[chat_id] = None
+            return
+
+        bot.send_message(chat_id, "⏳ جاري البحث عن الإجابة في المقررات...")
+        
+        try:
+            # توجيه أكاديمي لتقييد الإجابة
+            prompt = f"""
+            أنت مساعد أكاديمي متخصص للطلبة في التخصصات الجامعية والشهادات العامة في ليبيا.
+            أجب عن هذا السؤال العلمي باختصار ودقة وباللغة العربية، بناءً على المقررات المعتمدة:
+            السؤال: {text}
+            """
+            response = model.generate_content(prompt)
+            ai_reply = response.text
+        except Exception as e:
+            logger.error(f"AI Error: {e}")
+            ai_reply = "❌ عذراً، حدث خطأ أثناء الاتصال بالمساعد الذكي. يرجى المحاولة لاحقاً."
+
+        # إرسال الإجابة ثم عرض القائمة الرئيسية لتسهيل التنقل
+        bot.send_message(chat_id, ai_reply)
+        bot.send_message(chat_id, "هل تحتاج إلى شيء آخر؟ 📚", reply_markup=main_menu())
+        
+        # إنهاء وضع الذكاء الاصطناعي بعد الإجابة
+        user_states[chat_id] = None
 
 # ====================== CALLBACK HANDLER ======================
 @bot.callback_query_handler(func=lambda call: True)
@@ -190,8 +241,14 @@ def handle_buttons(call):
     chat_id = call.message.chat.id
     message_id = call.message.message_id
 
+    # =============== AI BUTTON ===============
+    if data == "ask_ai":
+        user_states[chat_id] = "waiting_for_ai"
+        bot.edit_message_text("🤖 <b>أهلاً بك! أنا المساعد الذكي.</b>\n\nتفضل واكتب سؤالك حول المنهج الآن وسأقوم بالرد عليك بناءً على المقررات:", chat_id, message_id, reply_markup=back_menu(), parse_mode="HTML")
+
     # =============== MAIN NAVIGATION ===============
-    if data == "main":
+    elif data == "main":
+        user_states[chat_id] = None # تصفير حالة الـ AI عند العودة للرئيسية
         bot.edit_message_text("🗂️ <b>القائمة الرئيسية</b>\n\nاختر القسم أو الكلية:", chat_id, message_id, reply_markup=main_menu(), parse_mode="HTML")
     
     elif data == "secondary":
@@ -442,7 +499,7 @@ def handle_buttons(call):
 # ====================== FLASK & WEBHOOK SETUP ======================
 @app.route("/")
 def home():
-    return "✅ Libyan Student Guide Bot is LIVE on Render!"
+    return "✅ Libyan Student Guide Bot is LIVE with AI on Render!"
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
